@@ -1,11 +1,33 @@
 import pandas as pd 
+import logging 
 
 class Pipeline():
     def __init__(self, path):
         self.df = pd.read_csv(path)
-        pass
+        
 
-    def complete_weight(self, pack_size_split, item_weight, item_volume,item_density):
+    def complete_weight(self, pack_size_split, item_weight, item_volume, item_density):
+        """
+        This function will handle the missing weight data.
+        We will apply this function to every row on the dataset, with that, the function works on a row-based level.
+        
+        So, we are passing as arguments only the columns we will need.
+
+        Firstly, the function will check if item_weight is a NaN, if isn't, then we don't need to complete it. 
+        Then, we will take the value referred to as the weight. 
+            Note: if the text on the pack_size_text is a text but doesn't contain the 'number kg' pattern,
+            this function will not work as expected.
+        For last, if the previous conditions aren't true, then the function will return item_volume * item_density
+
+            Parameters:
+                pack_size_split: the value of the pack_size_split column
+                item_weight: the value of the item_weight column
+                item_density: the value of the item_density column
+
+            Returns:
+                A float value filling the gaps in the item_weight column
+        """
+
         is_nan = item_weight != item_weight
 
         if not is_nan:
@@ -15,24 +37,55 @@ class Pipeline():
                 index_size = pack_size_split.index('kg')
                 return float(pack_size_split[index_size - 1])
             except Exception as e:
-                print("Error while executing pack_size_split: %s" % e)
+                logging.info("Error while executing pack_size_split: %s" % e)
                 return item_volume * item_density
 
+
     def complete_pack_size(self, pack_size_split, pack_size):
+        """
+            This function aims to split the pack_size_text on a list of strings.
+            This will help us to define the pack_size and the item_weight.
+
+            Parameters:
+                pack_size_split: the value of the pack_size_split column
+                pack_size: the value of the pack_size
+
+            Returns:
+                A list containing the string splitted or an empty list
+        """
         try:
             return float(pack_size_split[0]) if len(pack_size_split) > 1 else pack_size
         except Exception as e:
-            print("Error while executing complete_pack_size: %s" % e)
-            return None
+            logging.info("Error while executing complete_pack_size: %s" % e)
+            return []
+
 
     def complete_item_weight(self, item_density, item_volume, item_weight):
+        """
+            This function will complete the item_weight value.
+            The operation is basically multiplying the item_density by item_volume.
+
+            Parameters:
+                item_density: the value of the item_density column
+                item_weight: the value of the item_weight column
+
+            Returns:
+                A float value representing the item_weight.
+        """
         try:
             return item_density * item_volume
         except Exception as e:
-            print("Error while executing complete_item_weight: %s" % e)
-            return item_weight
+            logging.info("Error while executing complete_item_weight: %s" % e)
+            return float(item_weight)
 
     def exec(self):
+        """
+            This function is the core of this pipeline execution.
+            Will consolidate the logic and function's calls.
+
+            Returns:
+                The Dataframe object containing the total_weight filled.
+        """
         self.df['pack_size_text'] = self.df[['pack_size_text']].fillna('')
         self.df['pack_size_split'] = self.df['pack_size_text'].apply(lambda x: x.split(' ')) 
        

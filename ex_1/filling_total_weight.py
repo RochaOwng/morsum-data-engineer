@@ -60,23 +60,6 @@ class Pipeline():
             return []
 
 
-    def complete_item_weight(self, item_density, item_volume, item_weight):
-        """
-            This function will complete the item_weight value.
-            The operation is basically multiplying the item_density by item_volume.
-
-            Parameters:
-                item_density: the value of the item_density column
-                item_weight: the value of the item_weight column
-
-            Returns:
-                A float value representing the item_weight.
-        """
-        try:
-            return item_density * item_volume
-        except Exception as e:
-            logging.info("Error while executing complete_item_weight: %s" % e)
-            return float(item_weight)
 
     def exec(self):
         """
@@ -98,6 +81,7 @@ class Pipeline():
 
 
 pipeline = Pipeline('ingredient_quantities.csv')
-df = pipeline.exec()
+# df = pipeline.exec()
+df = pipeline.complete_weight(['5', 'bottles', 'of', '1', 'kg'], 1, 'NaN', 'NaN')
 
 print(df)

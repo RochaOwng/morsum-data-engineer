@@ -4,6 +4,9 @@ To execute this project, you should activate the Project Environment.
 
 To do this, run the following command:
 
+For this project, as it is a small one, I did upload to git the entire environment.
+Not the best practice, but just to help you execute the exercises.
+
 ```source morsumenv/bin/activate```
 
 ### Exercise 1:
